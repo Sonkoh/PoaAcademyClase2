@@ -1,11 +1,11 @@
 <?php
 session_start();
 require './config.php';
-$id = $_GET['id'];
-if (!isset($id)) {
+if (!isset($_GET['id'])) {
     header('Location: /');
 } else {
-    $sql = $conn->prepare("SELECT * FROM `tareas` WHERE id='$id'");
+    $sql = $conn->prepare("SELECT * FROM `tareas` WHERE id=:id");
+    $sql->bindParam(':id', $_GET['id']);
     $sql->execute();
     $info = $sql->fetch(PDO::FETCH_ASSOC);
     if ($info['autor'] != $_SESSION["nombre"]) {
@@ -14,9 +14,10 @@ if (!isset($id)) {
 }
 
 if (isset($_POST['desc'])) {
-    $title = $_POST['titulo'];
-    $desc = $_POST['desc'];
-    $sql = $conn->prepare("UPDATE `tareas` SET `titulo`='$title',`description`='$desc' WHERE id='$id'");
+    $sql = $conn->prepare("UPDATE `tareas` SET `titulo`=:title,`description`=:desc WHERE id=:id");
+    $sql->bindParam(':title', $_POST['titulo']);
+    $sql->bindParam(':desc', $_POST['desc']);
+    $sql->bindParam(':id', $_GET['id']);
     if ($sql->execute()) {
         header('Location: /');
     } else {
